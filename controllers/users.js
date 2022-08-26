@@ -2,6 +2,7 @@ const User = require('../models/user');
 
 const {
   validationErrorCode,
+  notFoundErrorCode,
   defaultErrorCode,
 } = require('../Errors');
 
@@ -41,12 +42,12 @@ module.exports.getUser = (req, res) => {
     .catch((err) => {
       if (err.name === 'Error') {
         res
-          .status(validationErrorCode)
+          .status(notFoundErrorCode)
           .send({ message: 'Запрашиваемый пользователь не найден' });
       } else {
         res
-          .status(defaultErrorCode)
-          .send({ message: 'На сервере произошла ошибка' });
+          .status(validationErrorCode)
+          .send({ message: 'переданы некорректные данные' });
       }
     });
 };

@@ -47,8 +47,8 @@ module.exports.deleteCard = (req, res) => {
           .send({ message: 'Запрашиваемая карточка не найдена' });
       } else {
         res
-          .status(defaultErrorCode)
-          .send({ message: 'На сервере произошла ошибка' });
+          .status(validationErrorCode)
+          .send({ message: 'Переданны некорректные данные' });
       }
     });
 };
@@ -66,12 +66,12 @@ module.exports.likeCard = (req, res) => {
     .catch((err) => {
       if (err.name === 'Error') {
         res
-          .status(validationErrorCode)
+          .status(notFoundErrorCode)
           .send({ message: 'Запрашиваемая карточка не найдена' });
       } else {
         res
-          .status(defaultErrorCode)
-          .send({ message: 'На сервере произошла ошибка' });
+          .status(validationErrorCode)
+          .send({ message: 'Переданны некорректные данные' });
       }
     });
 };
@@ -89,12 +89,12 @@ module.exports.dislikeCard = (req, res) => {
     .catch((err) => {
       if (err.name === 'Error') {
         res
-          .status(validationErrorCode)
+          .status(notFoundErrorCode)
           .send({ message: 'Запрашиваемая карточка не найдена' });
       } else {
         res
-          .status(defaultErrorCode)
-          .send({ message: 'На сервере произошла ошибка' });
+          .status(validationErrorCode)
+          .send({ message: 'Переданны некорректные данные' });
       }
     });
 };
