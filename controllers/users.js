@@ -33,9 +33,12 @@ module.exports.createUser = (req, res) => {
 
 module.exports.getUser = (req, res) => {
   User.findById(req.params.userId)
+    .orFail(() => {
+      throw new Error();
+    })
     .then((user) => res.send(user))
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.name === 'Error') {
         res
           .status(notFoundErrorCode)
           .send({ message: 'Запрашиваемый пользователь не найден' });

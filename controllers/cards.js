@@ -34,9 +34,12 @@ module.exports.getAllCards = (req, res) => {
 
 module.exports.deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
+    .orFail(() => {
+      throw new Error();
+    })
     .then((card) => res.send(card))
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.name === 'Error') {
         res
           .status(notFoundErrorCode)
           .send({ message: 'Запрашиваемая карточка не найдена' });
@@ -54,9 +57,12 @@ module.exports.likeCard = (req, res) => {
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
+    .orFail(() => {
+      throw new Error();
+    })
     .then((card) => res.send(card))
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.name === 'Error') {
         res
           .status(notFoundErrorCode)
           .send({ message: 'Запрашиваемая карточка не найдена' });
@@ -74,9 +80,12 @@ module.exports.dislikeCard = (req, res) => {
     { $pull: { likes: req.user._id } },
     { new: true },
   )
+    .orFail(() => {
+      throw new Error();
+    })
     .then((card) => res.send(card))
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.name === 'Error') {
         res
           .status(notFoundErrorCode)
           .send({ message: 'Запрашиваемая карточка не найдена' });
