@@ -6,7 +6,7 @@ const defaultErrorCode = 500;
 
 module.exports.getAllUsers = (req, res) => {
   User.find({})
-    .then((users) => res.send({ data: users }))
+    .then((users) => res.send(users))
     .catch(() => res
       .status(defaultErrorCode)
       .send({ message: 'На сервере произошла ошибка' }));
@@ -16,7 +16,7 @@ module.exports.createUser = (req, res) => {
   const { name, about, avatar } = req.body;
 
   User.create({ name, about, avatar })
-    .then((user) => res.send({ data: user }))
+    .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(validationErrorCode).send({
@@ -33,12 +33,9 @@ module.exports.createUser = (req, res) => {
 
 module.exports.getUser = (req, res) => {
   User.findById(req.params.userId)
-    .orFail(() => {
-      throw new Error();
-    })
-    .then((user) => res.send({ data: user }))
+    .then((user) => res.send(user))
     .catch((err) => {
-      if (err.name === 'Error') {
+      if (err.name === 'CastError') {
         res
           .status(notFoundErrorCode)
           .send({ message: 'Запрашиваемый пользователь не найден' });
@@ -52,18 +49,13 @@ module.exports.getUser = (req, res) => {
 
 module.exports.updateUserProfile = (req, res) => {
   const { name, about } = req.body;
-  User.findByIdAndUpdate(
-    req.user._id,
-    { name, about },
-    { new: true },
-  )
-    .then((user) => res.send({ data: user }))
+  User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
+    .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(validationErrorCode).send({
-          message:
-            'Переданы некорректные данные в методы обновления пользователя',
-        });
+        res
+          .status(notFoundErrorCode)
+          .send({ message: 'Переданы некорректные данные в методы обновления пользователя' });
       } else {
         res
           .status(defaultErrorCode)
@@ -74,14 +66,13 @@ module.exports.updateUserProfile = (req, res) => {
 
 module.exports.updateUserAvatar = (req, res) => {
   const { avatar } = req.body;
-  User.findByIdAndUpdate(req.user._id, { avatar }, { new: true })
-    .then((user) => res.send({ data: user }))
+  User.findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true })
+    .then((user) => res.send(user))
     .catch((err) => {
-      if (err.name === 'Error') {
-        res.status(validationErrorCode).send({
-          message:
-            'Переданы некорректные данные в методы обновления аватара пользователя',
-        });
+      if (err.name === 'ValidationError') {
+        res
+          .status(notFoundErrorCode)
+          .send({ message: 'Переданы некорректные данные в методы обновления аватара пользователя' });
       } else {
         res
           .status(defaultErrorCode)
