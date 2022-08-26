@@ -1,8 +1,10 @@
 const Card = require('../models/card');
 
-const validationErrorCode = 400;
-const notFoundErrorCode = 404;
-const defaultErrorCode = 500;
+const {
+  validationErrorCode,
+  notFoundErrorCode,
+  defaultErrorCode,
+} = require('../Errors');
 
 module.exports.createCard = (req, res) => {
   console.log(req.user._id);
@@ -64,7 +66,7 @@ module.exports.likeCard = (req, res) => {
     .catch((err) => {
       if (err.name === 'Error') {
         res
-          .status(notFoundErrorCode)
+          .status(validationErrorCode)
           .send({ message: 'Запрашиваемая карточка не найдена' });
       } else {
         res
@@ -87,7 +89,7 @@ module.exports.dislikeCard = (req, res) => {
     .catch((err) => {
       if (err.name === 'Error') {
         res
-          .status(notFoundErrorCode)
+          .status(validationErrorCode)
           .send({ message: 'Запрашиваемая карточка не найдена' });
       } else {
         res

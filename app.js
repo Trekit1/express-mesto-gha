@@ -2,7 +2,9 @@ const express = require('express');
 
 const mongoose = require('mongoose');
 
-const notFoundErrorCode = 404;
+const {
+  notFoundErrorCode,
+} = require('./Errors');
 
 const app = express();
 const { PORT = 3000 } = process.env;

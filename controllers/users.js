@@ -1,8 +1,9 @@
 const User = require('../models/user');
 
-const validationErrorCode = 400;
-const notFoundErrorCode = 404;
-const defaultErrorCode = 500;
+const {
+  validationErrorCode,
+  defaultErrorCode,
+} = require('../Errors');
 
 module.exports.getAllUsers = (req, res) => {
   User.find({})
@@ -40,7 +41,7 @@ module.exports.getUser = (req, res) => {
     .catch((err) => {
       if (err.name === 'Error') {
         res
-          .status(notFoundErrorCode)
+          .status(validationErrorCode)
           .send({ message: 'Запрашиваемый пользователь не найден' });
       } else {
         res
@@ -57,7 +58,7 @@ module.exports.updateUserProfile = (req, res) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res
-          .status(notFoundErrorCode)
+          .status(validationErrorCode)
           .send({ message: 'Переданы некорректные данные в методы обновления пользователя' });
       } else {
         res
@@ -74,7 +75,7 @@ module.exports.updateUserAvatar = (req, res) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res
-          .status(notFoundErrorCode)
+          .status(validationErrorCode)
           .send({ message: 'Переданы некорректные данные в методы обновления аватара пользователя' });
       } else {
         res
