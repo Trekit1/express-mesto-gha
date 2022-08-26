@@ -47,7 +47,7 @@ module.exports.getUser = (req, res) => {
       } else {
         res
           .status(validationErrorCode)
-          .send({ message: 'переданы некорректные данные' });
+          .send({ message: 'Переданы некорректные данные' });
       }
     });
 };

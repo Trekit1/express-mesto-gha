@@ -12,9 +12,6 @@
   "author": "Kirill Gurov",
   "license": "ISC",
   "dependencies": {
-    "eslint": "^8.22.0",
-    "eslint-config-airbnb-base": "^15.0.0",
-    "eslint-plugin-import": "^2.26.0",
     "express": "^4.18.1",
     "mongoose": "^6.5.2"
   },
@@ -22,8 +19,6 @@
     "nodemon": "^2.0.19",
     "eslint": "^8.22.0",
     "eslint-config-airbnb-base": "^15.0.0",
-    "eslint-plugin-import": "^2.26.0",
-    "express": "^4.18.1",
-    "mongoose": "^6.5.2"
+    "eslint-plugin-import": "^2.26.0"
   }
 }
