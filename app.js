@@ -2,6 +2,8 @@ const express = require('express');
 
 const mongoose = require('mongoose');
 
+const notFoundErrorCode = 404;
+
 const app = express();
 const { PORT = 3000 } = process.env;
 const routerUser = require('./routes/users');
@@ -24,7 +26,7 @@ app.use('/users', routerUser);
 app.use('/cards', routerCard);
 
 app.use('/', (req, res) => {
-  res.status(404).send({ message: 'Данная страница не найдена' });
+  res.status(notFoundErrorCode).send({ message: 'Данная страница не найдена' });
 });
 
 app.listen(PORT, () => {
