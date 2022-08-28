@@ -36,18 +36,20 @@ module.exports.createUser = (req, res) => {
 module.exports.getUser = (req, res) => {
   User.findById(req.params.userId)
     .orFail(() => {
-      throw new Error();
+      throw new Error('NotFound');
     })
     .then((user) => res.send(user))
     .catch((err) => {
-      if (err.name === 'Error') {
+      if (err.message === 'NotFound') {
         res
           .status(notFoundErrorCode)
           .send({ message: 'Запрашиваемый пользователь не найден' });
-      } else {
+      } else if (err.name === 'CastError') {
         res
           .status(validationErrorCode)
-          .send({ message: 'Переданы некорректные данные' });
+          .send({ message: 'Передан некорректный id' });
+      } else {
+        res.status(defaultErrorCode).send({ message: 'На сервере произошла ошибка' });
       }
     });
 };

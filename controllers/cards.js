@@ -37,18 +37,20 @@ module.exports.getAllCards = (req, res) => {
 module.exports.deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
     .orFail(() => {
-      throw new Error();
+      throw new Error('NotFound');
     })
     .then((card) => res.send(card))
     .catch((err) => {
-      if (err.name === 'Error') {
+      if (err.message === 'NotFound') {
         res
           .status(notFoundErrorCode)
           .send({ message: 'Запрашиваемая карточка не найдена' });
-      } else {
+      } else if (err.name === 'CastError') {
         res
           .status(validationErrorCode)
-          .send({ message: 'Переданны некорректные данные' });
+          .send({ message: 'Передан некорректный id карточки' });
+      } else {
+        res.status(defaultErrorCode).send({ message: 'На сервере произошла ошибка' });
       }
     });
 };
@@ -60,18 +62,20 @@ module.exports.likeCard = (req, res) => {
     { new: true },
   )
     .orFail(() => {
-      throw new Error();
+      throw new Error('NotFound');
     })
     .then((card) => res.send(card))
     .catch((err) => {
-      if (err.name === 'Error') {
+      if (err.message === 'NotFound') {
         res
           .status(notFoundErrorCode)
           .send({ message: 'Запрашиваемая карточка не найдена' });
-      } else {
+      } else if (err.name === 'CastError') {
         res
           .status(validationErrorCode)
-          .send({ message: 'Переданны некорректные данные' });
+          .send({ message: 'Передан некорректный id карточки' });
+      } else {
+        res.status(defaultErrorCode).send({ message: 'На сервере произошла ошибка' });
       }
     });
 };
@@ -83,18 +87,20 @@ module.exports.dislikeCard = (req, res) => {
     { new: true },
   )
     .orFail(() => {
-      throw new Error();
+      throw new Error('NotFound');
     })
     .then((card) => res.send(card))
     .catch((err) => {
-      if (err.name === 'Error') {
+      if (err.message === 'NotFound') {
         res
           .status(notFoundErrorCode)
           .send({ message: 'Запрашиваемая карточка не найдена' });
-      } else {
+      } else if (err.name === 'CastError') {
         res
           .status(validationErrorCode)
-          .send({ message: 'Переданны некорректные данные' });
+          .send({ message: 'Передан некорректный id карточки' });
+      } else {
+        res.status(defaultErrorCode).send({ message: 'На сервере произошла ошибка' });
       }
     });
 };
