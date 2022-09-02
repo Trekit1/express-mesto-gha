@@ -4,7 +4,6 @@ const jwt = require('jsonwebtoken');
 
 const User = require('../models/user');
 
-const AuthenticationError = require('../errors/authenticationErrorCode');
 const NotFoundError = require('../errors/notFoundError');
 const ValidateError = require('../errors/validateError');
 
@@ -21,7 +20,7 @@ module.exports.login = (req, res, next) => {
       return res.send({ token });
     })
     .catch(() => {
-      next(new AuthenticationError('Ошибка при попытке залогиниться'));
+      next(new ValidateError('Ошибка при попытке залогиниться'));
     });
 };
 
@@ -40,7 +39,15 @@ module.exports.createUser = (req, res, next) => {
     .then((hash) => User.create({
       name, about, avatar, password: hash, email,
     }))
-    .then((user) => res.send(user))
+    .then((user) => {
+      res.send({
+        name: user.name,
+        about: user.about,
+        avatar: user.avatar,
+        email: user.email,
+        _id: user._id,
+      });
+    })
     .catch((err) => {
       if (err.code === 11000) {
         return res.status(409).send({ message: 'Такой пользователь уже существует' });
