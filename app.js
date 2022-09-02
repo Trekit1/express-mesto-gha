@@ -6,16 +6,13 @@ const mongoose = require('mongoose');
 
 const { errors } = require('celebrate');
 
-const {
-  notFoundErrorCode,
-} = require('./Errors');
-
 const app = express();
 const { PORT = 3000 } = process.env;
 const routerUser = require('./routes/users');
 const routerCard = require('./routes/cards');
 const { login, createUser } = require('./controllers/users');
 const { auth } = require('./middlewares/auth');
+const NotFoundError = require('./errors/notFoundError');
 
 mongoose.connect('mongodb://localhost:27017/mestodb');
 
@@ -44,8 +41,8 @@ app.use('/users', routerUser);
 
 app.use('/cards', routerCard);
 
-app.use('/', (req, res) => {
-  res.status(notFoundErrorCode).send({ message: 'Данная страница не найдена' });
+app.use('/', (req, res, next) => {
+  next(new NotFoundError('Данная страница не найдена'));
 });
 
 app.use(errors());
