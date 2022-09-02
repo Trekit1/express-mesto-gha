@@ -26,11 +26,8 @@ module.exports.getAllCards = (req, res, next) => {
 module.exports.deleteCard = (req, res, next) => {
   console.log(req.owner);
   Card.findByIdAndRemove(req.params.cardId)
-    .orFail(() => {
-      throw new Error('NotFound');
-    })
     .then((card) => {
-      if (card.owner === !req.user._id) {
+      if (card.owner.toString === req.user._id) {
         throw new Error('Эту карточку нельзя удалить');
       } else {
         return res.send(card);
