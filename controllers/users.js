@@ -4,14 +4,11 @@ const jwt = require('jsonwebtoken');
 
 const User = require('../models/user');
 
-const {
-  validationErrorCode,
-  notFoundErrorCode,
-  defaultErrorCode,
-  authenticationErrorCode,
-} = require('../Errors');
+const AuthenticationError = require('../errors/authenticationErrorCode');
+const NotFoundError = require('../errors/notFoundError');
+const ValidateError = require('../errors/validateError');
 
-module.exports.login = (req, res) => {
+module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
 
   return User.findUserByCredentials(email, password)
@@ -20,26 +17,21 @@ module.exports.login = (req, res) => {
       res.send({ token });
       res
         .cookie('jwt', token, {
-          maxAge: 3600000,
           httpOnly: true,
         });
     })
     .catch(() => {
-      res
-        .status(authenticationErrorCode)
-        .send({ message: 'Ошибка при попытке залогиниться' });
+      next(new AuthenticationError('Ошибка при попытке залогиниться'));
     });
 };
 
-module.exports.getAllUsers = (req, res) => {
+module.exports.getAllUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send(users))
-    .catch(() => res
-      .status(defaultErrorCode)
-      .send({ message: 'На сервере произошла ошибка' }));
+    .catch(next);
 };
 
-module.exports.createUser = (req, res) => {
+module.exports.createUser = (req, res, next) => {
   const {
     name, about, avatar, password, email,
   } = req.body;
@@ -50,20 +42,16 @@ module.exports.createUser = (req, res) => {
     }))
     .then((user) => res.send(user))
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(validationErrorCode).send({
-          message:
-            'Переданы некорректные данные в методы создания пользователя',
-        });
-      } else {
-        res
-          .status(defaultErrorCode)
-          .send({ message: 'На сервере произошла ошибка' });
+      if (err.code === 11000) {
+        return res.status(409).send({ message: 'Такой пользователь уже существует' });
+      } if (err.name === 'ValidationError') {
+        return next(new ValidateError('Переданы некорректные данные в методы создания пользователя'));
       }
+      return next();
     });
 };
 
-module.exports.getUser = (req, res) => {
+module.exports.getUser = (req, res, next) => {
   console.log(req.params);
   User.findById(req.params.userId)
     .orFail(() => {
@@ -72,58 +60,44 @@ module.exports.getUser = (req, res) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.message === 'NotFound') {
-        res
-          .status(notFoundErrorCode)
-          .send({ message: 'Запрашиваемый пользователь не найден' });
+        next(new NotFoundError('Запрашиваемый пользователь не найден'));
       } else if (err.name === 'CastError') {
-        res
-          .status(validationErrorCode)
-          .send({ message: 'Передан некорректный id' });
-      } else {
-        res.status(defaultErrorCode).send({ message: 'На сервере произошла ошибка' });
+        next(new ValidateError('Передан некорректный id'));
+        return;
       }
+      next();
     });
 };
 
-module.exports.getUserInfo = (req, res) => {
+module.exports.getUserInfo = (req, res, next) => {
   console.log(req.params);
   User.findById(req.user._id)
     .then((user) => res.send(user))
-    .catch(() => res
-      .status(defaultErrorCode)
-      .send({ message: 'На сервере произошла ошибка' }));
+    .catch(next);
 };
 
-module.exports.updateUserProfile = (req, res) => {
+module.exports.updateUserProfile = (req, res, next) => {
   const { name, about } = req.body;
   User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res
-          .status(validationErrorCode)
-          .send({ message: 'Переданы некорректные данные в методы обновления пользователя' });
-      } else {
-        res
-          .status(defaultErrorCode)
-          .send({ message: 'На сервере произошла ошибка' });
+        next(new ValidateError('Переданы некорректные данные в методы обновления пользователя'));
+        return;
       }
+      next();
     });
 };
 
-module.exports.updateUserAvatar = (req, res) => {
+module.exports.updateUserAvatar = (req, res, next) => {
   const { avatar } = req.body;
   User.findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true })
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res
-          .status(validationErrorCode)
-          .send({ message: 'Переданы некорректные данные в методы обновления аватара пользователя' });
-      } else {
-        res
-          .status(defaultErrorCode)
-          .send({ message: 'На сервере произошла ошибка' });
+        next(new ValidateError('Переданы некорректные данные в методы обновления пользователя'));
+        return;
       }
+      next();
     });
 };

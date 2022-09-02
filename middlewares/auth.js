@@ -17,9 +17,8 @@ module.exports.auth = (req, res, next) => {
   try {
     payload = jwt.verify(token, 'some-secret-key');
   } catch (err) {
-    return res
-      .status(authenticationErrorCode)
-      .send({ message: 'Необходимо авторизироваться' });
+    const error = new Error('Необходимо авторизироваться');
+    error.statusCode = 401;
   }
 
   req.user = payload;
