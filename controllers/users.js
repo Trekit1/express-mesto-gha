@@ -26,6 +26,14 @@ module.exports.login = (req, res) => {
     });
 };
 
+module.exports.getUserInfo = (req, res) => {
+  User.findById(req.user._id)
+    .then((user) => res.send(user))
+    .catch((err) => {
+      res.status(401).send({ message: err.message });
+    });
+};
+
 module.exports.getAllUsers = (req, res) => {
   User.find({})
     .then((users) => res.send(users))
