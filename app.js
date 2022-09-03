@@ -11,6 +11,10 @@ const { PORT = 3000 } = process.env;
 const routerUser = require('./routes/users');
 const routerCard = require('./routes/cards');
 
+const { login, createUser } = require('./controllers/users');
+
+const auth = require('./middlewares/auth');
+
 mongoose.connect('mongodb://localhost:27017/mestodb');
 
 app.use(express.json());
@@ -22,6 +26,12 @@ app.use((req, res, next) => {
 
   next();
 });
+
+app.post('/signin', login);
+
+app.post('/signup', createUser);
+
+app.use(auth);
 
 app.use('/users', routerUser);
 
