@@ -35,11 +35,17 @@ module.exports.getAllCards = (req, res) => {
 };
 
 module.exports.deleteCard = (req, res) => {
-  Card.findByIdAndRemove(req.params.cardId)
+  Card.findById(req.params.cardId)
     .orFail(() => {
       throw new Error('NotFound');
     })
-    .then((card) => res.send(card))
+    .then((card) => {
+      if (card.owner.toString() === req.user._id) {
+        Card.deleteOne(card)
+          .then(() => res.send({ message: 'Карточка удалена' }));
+      }
+      throw new Error();
+    })
     .catch((err) => {
       if (err.message === 'NotFound') {
         res
