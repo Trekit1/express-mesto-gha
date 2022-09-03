@@ -1,8 +1,8 @@
 const express = require('express');
 
-const { celebrate, Joi } = require('celebrate');
-
 const mongoose = require('mongoose');
+
+const { celebrate, Joi } = require('celebrate');
 
 const app = express();
 const { PORT = 3000 } = process.env;
@@ -44,7 +44,6 @@ app.use('/', (req, res, next) => {
   next(new NotFoundError('Данная страница не найдена'));
 });
 
-// eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
   const { statusCode = 500, message } = err;
   res.status(statusCode)
@@ -53,6 +52,7 @@ app.use((err, req, res, next) => {
         ? 'На сервере произошла ошибка'
         : message,
     });
+  next();
 });
 
 app.listen(PORT, () => {
