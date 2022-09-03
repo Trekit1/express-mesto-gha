@@ -1,16 +1,14 @@
 const express = require('express');
 
-const mongoose = require('mongoose');
+const { celebrate, Joi } = require('celebrate');
 
-const {
-  notFoundErrorCode,
-} = require('./Errors');
+const mongoose = require('mongoose');
 
 const app = express();
 const { PORT = 3000 } = process.env;
 const routerUser = require('./routes/users');
 const routerCard = require('./routes/cards');
-
+const NotFoundError = require('./errors/NotFoundError');
 const { login, createUser } = require('./controllers/users');
 
 const auth = require('./middlewares/auth');
@@ -19,9 +17,19 @@ mongoose.connect('mongodb://localhost:27017/mestodb');
 
 app.use(express.json());
 
-app.post('/signin', login);
+app.post('/signin', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required(),
+    password: Joi.string().required(),
+  }),
+}), login);
 
-app.post('/signup', createUser);
+app.post('/signup', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required(),
+    password: Joi.string().required(),
+  }),
+}), createUser);
 
 app.use(auth);
 
@@ -29,8 +37,8 @@ app.use('/users', routerUser);
 
 app.use('/cards', routerCard);
 
-app.use('/', (req, res) => {
-  res.status(notFoundErrorCode).send({ message: 'Данная страница не найдена' });
+app.use('/', (req, res, next) => {
+  next(new NotFoundError('Данная страница не найдена'));
 });
 
 // eslint-disable-next-line no-unused-vars
