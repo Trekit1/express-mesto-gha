@@ -4,6 +4,8 @@ const mongoose = require('mongoose');
 
 const { celebrate, Joi } = require('celebrate');
 
+const { errors } = require('celebrate');
+
 const app = express();
 const { PORT = 3000 } = process.env;
 const routerUser = require('./routes/users');
@@ -43,6 +45,8 @@ app.use('/cards', routerCard);
 app.use('/', (req, res, next) => {
   next(new NotFoundError('Данная страница не найдена'));
 });
+
+app.use(errors());
 
 app.use((err, req, res, next) => {
   const { statusCode = 500, message } = err;
