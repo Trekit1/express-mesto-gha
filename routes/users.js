@@ -14,7 +14,11 @@ routerUser.patch('/me', celebrate({
     about: Joi.string().min(2).max(30),
   }),
 }), updateUserProfile);
-routerUser.patch('/me/avatar', updateUserAvatar);
+routerUser.patch('/me/avatar', celebrate({
+  body: Joi.object().keys({
+    avatar: Joi.string().regex(/https?:\/\/(www\.)?([a-zA-Z0-9-._~:/?#@!$&'()+,;=]*)\.([a-zA-Z])#?/),
+  }),
+}), updateUserAvatar);
 routerUser.get('/:userId', celebrate({
   params: Joi.object().keys({
     userId: Joi.string().alphanum().length(24).hex(),
